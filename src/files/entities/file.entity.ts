@@ -30,3 +30,8 @@ export class FileEntity {
   @ManyToOne(() => UserEntity, (user) => user.files)
   user: UserEntity;
 }
+
+export enum FileType {
+  PHOTOS = 'photos',
+  TRASH = 'trash',
+}

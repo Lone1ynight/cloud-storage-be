@@ -2,29 +2,32 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   UseInterceptors,
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
+  UseGuards,
+  Query,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { UserId } from '../decorators/user-id.decorator.js';
+import { FileType } from './entities/file.entity.js';
 import { FilesService } from './files.service';
-import { CreateFileDto } from './dto/create-file.dto';
 import { fileStorage } from './storage.js';
 
 @Controller('files')
 @ApiTags('files')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get()
-  findAll() {
-    return this.filesService.findAll();
+  findAll(@UserId() userId: number, @Query('type') fileType: FileType) {
+    return this.filesService.findAll(userId, fileType);
   }
 
   @Post()
@@ -52,27 +55,13 @@ export class FilesController {
       }),
     )
     file: Express.Multer.File,
+    @UserId() userId: number,
   ) {
-    return file;
+    return this.filesService.create(file, userId);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.filesService.findAll();
-  // }
-  //
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.filesService.findOne(+id);
-  // }
-  //
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-  //   return this.filesService.update(+id, updateFileDto);
-  // }
-  //
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.filesService.remove(+id);
-  // }
+  @Delete(':id')
+  remove(@UserId() userId: number, @Query('ids') ids: string) {
+    return this.filesService.remove(userId, ids);
+  }
 }
