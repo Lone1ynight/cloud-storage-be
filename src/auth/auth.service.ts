@@ -31,7 +31,7 @@ export class AuthService {
       throw new UnauthorizedException('Wrong email or password');
     }
 
-    const { password, ...result } = user;
+    const { ...result } = user;
 
     return result;
   }
@@ -41,6 +41,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload),
+      user,
     };
   }
 

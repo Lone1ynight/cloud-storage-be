@@ -30,7 +30,11 @@ export class UsersService {
       password: hashedPassword,
     });
 
-    return newUser;
+    return {
+      email: newUser.email,
+      id: newUser.id,
+      fullName: newUser.fullName,
+    };
   }
 
   findByEmail(email: string) {

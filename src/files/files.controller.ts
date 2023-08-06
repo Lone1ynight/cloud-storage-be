@@ -60,7 +60,7 @@ export class FilesController {
     return this.filesService.create(file, userId);
   }
 
-  @Delete(':id')
+  @Delete()
   remove(@UserId() userId: number, @Query('ids') ids: string) {
     return this.filesService.remove(userId, ids);
   }
